@@ -1,0 +1,56 @@
+server:
+  port: 8760
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: dummy-service
+          uri: lb://dummy-service
+          predicates:
+            - Path=/dummy/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+        - id: project-service
+          uri: lb://project-service
+          predicates:
+            - Path=/project/**
+        - id: registry
+          uri: lb://registry
+          predicates:
+            - Path=/registry/**
+          filters:
+            - StripPrefix=1
+        - id: eureka
+          uri: lb://registry
+          predicates:
+            - Path=/eureka/**
+        - id: kafdrop
+          uri: http://kafdrop:9000
+          predicates:
+            - Path=/kafdrop/**
+
+info:
+  app:
+    name: ${spring.application.name}
+
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER:http://registry:8761/eureka}
+    healthcheck:
+      enabled: true
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include:
+#          - mappings
+#          - env
+#          - health
+#          - info
